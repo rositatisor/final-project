@@ -6,18 +6,18 @@ namespace App\Domain\Ingredients\Dto;
 
 class Ingredient
 {
-    private int $quantity;
+    private string $quantity;
     private string $measurement;
     private string $name;
 
-    public function __construct(int $quantity, string $measurement, string $name)
+    public function __construct(string $quantity, string $measurement, string $name)
     {
         $this->quantity = $quantity;
         $this->measurement = $measurement;
         $this->name = $name;
     }
 
-    public function getQuantity(): int
+    public function getQuantity(): string
     {
         return $this->quantity;
     }

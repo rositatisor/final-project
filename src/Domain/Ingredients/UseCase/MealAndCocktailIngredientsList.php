@@ -4,33 +4,40 @@ declare(strict_types=1);
 
 namespace App\Domain\Ingredients\UseCase;
 
+use App\Domain\Ingredients\Dto\Ingredient;
 use App\Domain\Ingredients\Dto\IngredientListCollection;
-use App\Domain\Meal\Service\Client as Meal;
-use App\Domain\Cocktail\Service\Client as Cocktail;
+use App\Domain\TheMealDb\Service\Client as Meal;
+use App\Domain\TheCocktailDb\Service\Client as Cocktail;
 
 class MealAndCocktailIngredientsList
 {
+    // maybe both clients should be separated in different classes?
+
     private Meal $meal;
     private Cocktail $cocktail;
 
     public function __construct()
     {
-        // mealClient -> MealCollection [Meal]
-        $this->meal = new Meal;
-        // cocktailClient -> CocktailCollection [Cocktail]
+        $this->meal = new Meal();
         $this->cocktail = new Cocktail();
-        // [Meal] & [Cocktail] -> Ingredient
     }
 
     public function execute(): IngredientListCollection
     {
-        // fetch random meal recipe
-        // $mealClient->getMeal(); or getMealIngredients();
+        $listOfIngredients = new IngredientListCollection();
 
-        // fetch random cocktail recipe
-        // $cocktailClient->getCocktail(); or getCocktailIngredients();
+        $mealIngredients = $this->meal->getIngredients();
+        foreach ($mealIngredients as $ingredient) {
+            assert($ingredient instanceof Ingredient);
+            $listOfIngredients->add($ingredient);
+        }
 
-        // return ingredients list collection
-        // return IngredientListCollection $ingredientsList;
+        $cocktailIngredients = $this->cocktail->getIngredients();
+        foreach ($cocktailIngredients as $ingredient) {
+            assert($ingredient instanceof Ingredient);
+            $listOfIngredients->add($ingredient);
+        }
+
+         return $listOfIngredients;
     }
 }

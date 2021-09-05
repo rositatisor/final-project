@@ -6,5 +6,8 @@ namespace App\Domain\Ingredients\Dto;
 
 class IngredientListCollection
 {
+    public function add(Ingredient $ingredient): void
+    {
 
+    }
 }
