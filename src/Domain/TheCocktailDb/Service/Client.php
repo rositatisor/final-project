@@ -6,28 +6,24 @@ namespace App\Domain\TheCocktailDb\Service;
 
 use App\Application\IngredientCollection\IngredientCollectionDenormalizer;
 use App\Application\IngredientCollection\IngredientDenormalizer;
+use App\Application\IngredientCollection\IngredientSerializer;
 use App\Domain\Dto\IngredientCollection;
-use App\Domain\Ingredients\Dto\Ingredient;
 use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
-use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Doctrine\Common\Annotations\AnnotationReader;
 
 class Client
 {
     private const GET_RANDOM_MEAL_ENDPOINT = '/1/random.php';
     private const GET = 'GET';
+    private const RANDOM = 0;
     private HttpClientInterface $http;
+    private Serializer $serializer;
 
-    public function __construct()
+    public function __construct(IngredientSerializer $serializer)
     {
         $this->http = HttpClient::create();
+        $this->serializer = $serializer;
     }
 
     public function getCocktail()
@@ -40,16 +36,10 @@ class Client
         $content = $response->getContent();
 
         // TODO: extract further logic to new class
-        $classMetadataFactory = new ClassMetaDataFactory(new AnnotationLoader(new AnnotationReader()));
-        $metadataAwareNameConverter = new MetadataAwareNameConverter($classMetadataFactory);
-        $encoders = [new JsonEncoder()];
-        $normalizers = [new ObjectNormalizer($classMetadataFactory, $metadataAwareNameConverter)];
         $denormalizer = new IngredientCollectionDenormalizer(new IngredientDenormalizer());
-        $serializer = new Serializer($normalizers, $encoders);
 
-        $drinks = $serializer->decode($content, 'json');
-        $cocktail = $drinks['drinks'][0];
-
+        $drinks = $this->serializer->decode($content, 'json');
+        $cocktail = $drinks['drinks'][self::RANDOM];
         $drink = $denormalizer->denormalize(
             $this->getListOfIngredients($cocktail),
             IngredientCollection::class,
@@ -57,11 +47,6 @@ class Client
         );
 
         return $drink;
-    }
-
-    public function getIngredients(): IngredientCollection
-    {
-        return new IngredientCollection();
     }
 
     // TODO: refactor method
@@ -95,7 +80,7 @@ class Client
             $listOfIngredients[] = [
                 'quantity' => $ingredient['quantity'][$i] ?? '',
                 'measurement' => $ingredient['measurement'][$i] ?? '',
-                'name' => $ingredient['name'][$i],
+                'name' => $ingredient['name'][$i] ?? '',
             ];
         }
 

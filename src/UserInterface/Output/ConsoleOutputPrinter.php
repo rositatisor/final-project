@@ -8,6 +8,6 @@ class ConsoleOutputPrinter implements OutputInterface
 {
     public function print(string $print)
     {
-        // TODO: implement print() method
+        print($print);
     }
 }

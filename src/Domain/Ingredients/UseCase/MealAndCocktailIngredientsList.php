@@ -11,15 +11,13 @@ use App\Domain\TheCocktailDb\Service\Client as Cocktail;
 
 class MealAndCocktailIngredientsList
 {
-    // maybe both clients should be separated in different classes?
-
     private Meal $meal;
     private Cocktail $cocktail;
 
-    public function __construct()
+    public function __construct(Meal $meal, Cocktail $cocktail)
     {
-        $this->meal = new Meal();
-        $this->cocktail = new Cocktail();
+        $this->meal = $meal;
+        $this->cocktail = $cocktail;
     }
 
     public function execute(): IngredientListCollection
@@ -27,13 +25,13 @@ class MealAndCocktailIngredientsList
         $listOfIngredients = new IngredientListCollection();
 
         $mealIngredients = $this->meal->getIngredients();
-        foreach ($mealIngredients as $ingredient) {
+        foreach ($mealIngredients->ingredients as $ingredient) {
             assert($ingredient instanceof Ingredient);
             $listOfIngredients->add($ingredient);
         }
 
-        $cocktailIngredients = $this->cocktail->getIngredients();
-        foreach ($cocktailIngredients as $ingredient) {
+        $cocktailIngredients = $this->cocktail->getCocktail(); // getIngredients()
+        foreach ($cocktailIngredients->ingredients as $ingredient) {
             assert($ingredient instanceof Ingredient);
             $listOfIngredients->add($ingredient);
         }

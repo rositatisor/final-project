@@ -6,7 +6,7 @@ use App\Domain\Ingredients\Dto\Ingredient;
 
 class IngredientCollection
 {
-    private array $ingredients;
+    public array $ingredients;
 
     public function __construct(Ingredient... $ingredients)
     {
