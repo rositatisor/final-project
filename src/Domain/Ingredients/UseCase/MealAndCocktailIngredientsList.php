@@ -24,7 +24,7 @@ class MealAndCocktailIngredientsList
     {
         $listOfIngredients = new IngredientListCollection();
 
-        $mealIngredients = $this->meal->getIngredients();
+        $mealIngredients = $this->meal->getMeal(); // getIngredients()
         foreach ($mealIngredients->ingredients as $ingredient) {
             assert($ingredient instanceof Ingredient);
             $listOfIngredients->add($ingredient);
