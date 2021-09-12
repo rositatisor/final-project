@@ -24,13 +24,13 @@ class MealAndCocktailIngredientsList
     {
         $listOfIngredients = new IngredientListCollection();
 
-        $mealIngredients = $this->meal->getMeal(); // getIngredients()
+        $mealIngredients = $this->meal->getIngredients();
         foreach ($mealIngredients->ingredients as $ingredient) {
             assert($ingredient instanceof Ingredient);
             $listOfIngredients->add($ingredient);
         }
 
-        $cocktailIngredients = $this->cocktail->getCocktail(); // getIngredients()
+        $cocktailIngredients = $this->cocktail->getIngredients();
         foreach ($cocktailIngredients->ingredients as $ingredient) {
             assert($ingredient instanceof Ingredient);
             $listOfIngredients->add($ingredient);

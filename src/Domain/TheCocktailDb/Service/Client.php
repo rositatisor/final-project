@@ -6,12 +6,15 @@ namespace App\Domain\TheCocktailDb\Service;
 
 use App\Application\IngredientCollection\IngredientCollectionDenormalizer;
 use App\Application\IngredientCollection\IngredientSerializer;
+use App\Domain\ClientInterface;
 use App\Domain\Dto\IngredientCollection;
+use App\Exceptions\RequestFailedException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class Client
+class Client implements ClientInterface
 {
     private const GET_RANDOM_MEAL_ENDPOINT = '/1/random.php';
     private const GET = 'GET';
@@ -34,23 +37,34 @@ class Client
         $this->baseUri = $baseUri;
     }
 
-    public function getCocktail(): IngredientCollection
+    public function getIngredients(): IngredientCollection
     {
-         $response = $this->http->request(
-             self::GET,
-             $this->baseUri . self::GET_RANDOM_MEAL_ENDPOINT
-         );
-
-        $content = $response->getContent();
-
-        $drinks = $this->serializer->decode($content, 'json');
-        $cocktail = $drinks['drinks'][self::RANDOM];
         $drink = $this->denormalizer->denormalize(
-            $cocktail,
+            $this->getCocktail(),
             IngredientCollection::class,
             'array',
         );
 
         return $drink;
+    }
+
+    public function getResponse(): ResponseInterface
+    {
+        try {
+            return $this->http->request(
+                self::GET,
+                $this->baseUri . self::GET_RANDOM_MEAL_ENDPOINT
+            );
+        } catch (\Exception $e) {
+            throw new RequestFailedException($e->getMessage());
+        }
+    }
+
+    private function getCocktail(): array
+    {
+        $content = $this->getResponse()->getContent();
+        $drinks = $this->serializer->decode($content, 'json');
+
+        return $drinks['drinks'][self::RANDOM];
     }
 }

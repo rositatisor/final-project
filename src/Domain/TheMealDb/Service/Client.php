@@ -6,11 +6,14 @@ namespace App\Domain\TheMealDb\Service;
 
 use App\Application\IngredientCollection\IngredientCollectionDenormalizer;
 use App\Application\IngredientCollection\IngredientSerializer;
+use App\Domain\ClientInterface;
 use App\Domain\Dto\IngredientCollection;
+use App\Exceptions\RequestFailedException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class Client
+class Client implements ClientInterface
 {
     private const GET_RANDOM_MEAL_ENDPOINT = '/1/random.php';
     private const GET = 'GET';
@@ -32,23 +35,34 @@ class Client
         $this->baseUri = $baseUri;
     }
 
-    public function getMeal(): IngredientCollection
+    public function getIngredients(): IngredientCollection
     {
-        $response = $this->http->request(
-            self::GET,
-            $this->baseUri . self::GET_RANDOM_MEAL_ENDPOINT
-        );
-
-        $content = $response->getContent();
-
-        $meals = $this->serializer->decode($content, 'json');
-        $mealRecipe = $meals['meals'][self::RANDOM];
         $meal = $this->denormalizer->denormalize(
-            $mealRecipe,
+            $this->getMeal(),
             IngredientCollection::class,
             'array',
         );
 
         return $meal;
+    }
+
+    public function getResponse(): ResponseInterface
+    {
+        try {
+            return $this->http->request(
+                self::GET,
+                $this->baseUri . self::GET_RANDOM_MEAL_ENDPOINT
+            );
+        } catch (\Exception $e) {
+            throw new RequestFailedException($e->getMessage());
+        }
+    }
+
+    private function getMeal(): array
+    {
+        $content = $this->getResponse()->getContent();
+        $meals = $this->serializer->decode($content, 'json');
+
+        return $meals['meals'][self::RANDOM];
     }
 }
