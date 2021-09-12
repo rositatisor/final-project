@@ -32,7 +32,7 @@ class Client
         $this->baseUri = $baseUri;
     }
 
-    public function getMeal()
+    public function getMeal(): IngredientCollection
     {
         $response = $this->http->request(
             self::GET,
@@ -44,54 +44,11 @@ class Client
         $meals = $this->serializer->decode($content, 'json');
         $mealRecipe = $meals['meals'][self::RANDOM];
         $meal = $this->denormalizer->denormalize(
-            $this->getListOfIngredients($mealRecipe),
+            $mealRecipe,
             IngredientCollection::class,
             'array',
         );
 
         return $meal;
-    }
-
-    public function getIngredients(): IngredientCollection
-    {
-        return new IngredientCollection();
-    }
-
-    // TODO: refactor method
-    public function getListOfIngredients($meal): array
-    {
-        $ingredient = [];
-
-        foreach ($meal as $key => $value) {
-            if ($value === null) {
-                continue;
-            }
-            if (str_starts_with($key, 'strIngredient')) {
-                $ingredient['name'][] = $value;
-            }
-            if (str_starts_with($key, 'strMeasure')) {
-                $patternM = '/[a-zA-Z]+?(?=\s*?[^\w]*?$)/';
-                preg_match_all($patternM, (string) $value, $matchesM);
-
-                $ingredient['measurement'][] = $matchesM[0][0] ?? '';
-
-                $patternQ = '/(?:\d\d* |)(?:\d\d*|0)(?:\/\d\d*)?/';
-                preg_match_all($patternQ, (string) $value, $matchesQ);
-
-                $ingredient['quantity'][] = $matchesQ[0][0] ?? '';
-            }
-        }
-
-        $listOfIngredients = [];
-
-        for($i = 0, $iMax = count($ingredient); $i < $iMax; $i++) {
-            $listOfIngredients[] = [
-                'quantity' => $ingredient['quantity'][$i] ?? '',
-                'measurement' => $ingredient['measurement'][$i] ?? '',
-                'name' => $ingredient['name'][$i] ?? '',
-            ];
-        }
-
-        return $listOfIngredients;
     }
 }
