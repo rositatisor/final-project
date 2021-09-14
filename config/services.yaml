@@ -26,3 +26,11 @@ services:
 
     App\Application\Command\GenerateIngredientsList:
         public: true
+
+    App\Domain\TheCocktailDb\Service\Client:
+        arguments:
+            $baseUri: '%APP_COCKTAIL_API_BASE_URI%'
+
+    App\Domain\TheMealDb\Service\Client:
+        arguments:
+            $baseUri: '%APP_MEAL_API_BASE_URI%'

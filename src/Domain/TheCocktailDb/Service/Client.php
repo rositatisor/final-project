@@ -5,43 +5,43 @@ declare(strict_types=1);
 namespace App\Domain\TheCocktailDb\Service;
 
 use App\Application\IngredientCollection\IngredientCollectionDenormalizer;
-use App\Application\IngredientCollection\IngredientDenormalizer;
 use App\Application\IngredientCollection\IngredientSerializer;
+use App\Domain\ClientInterface;
 use App\Domain\Dto\IngredientCollection;
+use App\Exceptions\RequestFailedException;
+use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class Client
+class Client implements ClientInterface
 {
     private const GET_RANDOM_MEAL_ENDPOINT = '/1/random.php';
     private const GET = 'GET';
     private const RANDOM = 0;
+
     private HttpClientInterface $http;
     private Serializer $serializer;
+    private IngredientCollectionDenormalizer $denormalizer;
+    private string $baseUri;
 
-    public function __construct(IngredientSerializer $serializer)
+    public function __construct(
+        IngredientSerializer $serializer,
+        IngredientCollectionDenormalizer $denormalizer,
+        string $baseUri
+    )
     {
         $this->http = HttpClient::create();
         $this->serializer = $serializer;
+        $this->denormalizer = $denormalizer;
+        $this->baseUri = $baseUri;
     }
 
-    public function getCocktail()
+    public function getIngredients(): IngredientCollection
     {
-         $response = $this->http->request(
-             self::GET,
-             'https://www.thecocktaildb.com/api/json/v1' . self::GET_RANDOM_MEAL_ENDPOINT
-         ); // TODO: maybe transfer API request information to yaml
-
-        $content = $response->getContent();
-
-        // TODO: extract further logic to new class
-        $denormalizer = new IngredientCollectionDenormalizer(new IngredientDenormalizer());
-
-        $drinks = $this->serializer->decode($content, 'json');
-        $cocktail = $drinks['drinks'][self::RANDOM];
-        $drink = $denormalizer->denormalize(
-            $this->getListOfIngredients($cocktail),
+        $drink = $this->denormalizer->denormalize(
+            $this->getCocktail(),
             IngredientCollection::class,
             'array',
         );
@@ -49,41 +49,23 @@ class Client
         return $drink;
     }
 
-    // TODO: refactor method
-    public function getListOfIngredients($cocktail): array
+    public function getResponse(): ResponseInterface
     {
-        $ingredient = [];
-
-        foreach ($cocktail as $key => $value) {
-            if ($value === null) {
-                continue;
-            }
-            if (str_starts_with($key, 'strIngredient')) {
-                $ingredient['name'][] = $value;
-            }
-            if (str_starts_with($key, 'strMeasure')) {
-                $patternM = '/[a-zA-Z]+?(?=\s*?[^\w]*?$)/';
-                preg_match_all($patternM, (string) $value, $matchesM);
-
-                $ingredient['measurement'][] = $matchesM[0][0] ?? '';
-
-                $patternQ = '/(?:\d\d* |)(?:\d\d*|0)(?:\/\d\d*)?/';
-                preg_match_all($patternQ, (string) $value, $matchesQ);
-
-                $ingredient['quantity'][] = $matchesQ[0][0] ?? '';
-            }
+        try {
+            return $this->http->request(
+                self::GET,
+                $this->baseUri . self::GET_RANDOM_MEAL_ENDPOINT
+            );
+        } catch (ClientException $e) {
+            throw new RequestFailedException($e->getMessage());
         }
+    }
 
-        $listOfIngredients = [];
+    private function getCocktail(): array
+    {
+        $content = $this->getResponse()->getContent();
+        $drinks = $this->serializer->decode($content, 'json');
 
-        for($i = 0, $iMax = count($ingredient); $i < $iMax; $i++) {
-            $listOfIngredients[] = [
-                'quantity' => $ingredient['quantity'][$i] ?? '',
-                'measurement' => $ingredient['measurement'][$i] ?? '',
-                'name' => $ingredient['name'][$i] ?? '',
-            ];
-        }
-
-        return $listOfIngredients;
+        return $drinks['drinks'][self::RANDOM];
     }
 }

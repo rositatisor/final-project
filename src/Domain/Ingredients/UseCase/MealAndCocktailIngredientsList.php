@@ -30,7 +30,7 @@ class MealAndCocktailIngredientsList
             $listOfIngredients->add($ingredient);
         }
 
-        $cocktailIngredients = $this->cocktail->getCocktail(); // getIngredients()
+        $cocktailIngredients = $this->cocktail->getIngredients();
         foreach ($cocktailIngredients->ingredients as $ingredient) {
             assert($ingredient instanceof Ingredient);
             $listOfIngredients->add($ingredient);
