@@ -9,6 +9,7 @@ use App\Application\IngredientCollection\IngredientSerializer;
 use App\Domain\ClientInterface;
 use App\Domain\Dto\IngredientCollection;
 use App\Exceptions\RequestFailedException;
+use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -55,7 +56,7 @@ class Client implements ClientInterface
                 self::GET,
                 $this->baseUri . self::GET_RANDOM_MEAL_ENDPOINT
             );
-        } catch (\Exception $e) {
+        } catch (ClientException $e) {
             throw new RequestFailedException($e->getMessage());
         }
     }

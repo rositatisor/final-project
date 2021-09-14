@@ -29,8 +29,8 @@ services:
 
     App\Domain\TheCocktailDb\Service\Client:
         arguments:
-            $baseUri: 'https://www.thecocktaildb.com/api/json/v1'
+            $baseUri: '%APP_COCKTAIL_API_BASE_URI%'
 
     App\Domain\TheMealDb\Service\Client:
         arguments:
-            $baseUri: 'https://www.themealdb.com/api/json/v1'
+            $baseUri: '%APP_MEAL_API_BASE_URI%'
