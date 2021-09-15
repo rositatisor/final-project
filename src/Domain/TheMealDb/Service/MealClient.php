@@ -16,7 +16,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class MealClient implements ClientInterface
 {
-    private const GET_RANDOM_MEAL_ENDPOINT = '/1/random.php';
+    private const RANDOM_MEAL_ENDPOINT = '/1/random.php';
     private const GET = 'GET';
     private const RANDOM = 0;
 
@@ -52,7 +52,7 @@ class MealClient implements ClientInterface
         try {
             return $this->http->request(
                 self::GET,
-                $this->baseUri . self::GET_RANDOM_MEAL_ENDPOINT
+                $this->baseUri . self::RANDOM_MEAL_ENDPOINT
             );
         } catch (ClientException $e) {
             throw new RequestFailedException($e->getMessage());

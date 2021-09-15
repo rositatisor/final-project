@@ -23,19 +23,27 @@ class MealAndCocktailIngredientsFetcher
     public function execute(): IngredientListCollection
     {
         $listOfIngredients = new IngredientListCollection();
+        $this->addMealIngredients($listOfIngredients);
+        $this->addCocktailIngredients($listOfIngredients);
 
+        return $listOfIngredients;
+    }
+
+    public function addMealIngredients(IngredientListCollection $listOfIngredients): void
+    {
         $mealIngredients = $this->meal->getIngredients();
         foreach ($mealIngredients->ingredients as $ingredient) {
             assert($ingredient instanceof Ingredient);
             $listOfIngredients->add($ingredient);
         }
+    }
 
+    public function addCocktailIngredients(IngredientListCollection $listOfIngredients): void
+    {
         $cocktailIngredients = $this->cocktail->getIngredients();
         foreach ($cocktailIngredients->ingredients as $ingredient) {
             assert($ingredient instanceof Ingredient);
             $listOfIngredients->add($ingredient);
         }
-
-        return $listOfIngredients;
     }
 }
