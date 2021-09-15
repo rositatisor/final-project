@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Application\Command;
 
 use App\Domain\Ingredients\Dto\Ingredient;
-use App\Domain\Ingredients\UseCase\MealAndCocktailIngredientsList;
+use App\Domain\Ingredients\UseCase\MealAndCocktailIngredientsFetcher;
 use App\UserInterface\Output\ConsoleOutputPrinter;
 
 class GenerateIngredientsList
 {
-    private MealAndCocktailIngredientsList $useCase;
+    private MealAndCocktailIngredientsFetcher $useCase;
     private ConsoleOutputPrinter $output;
 
-    public function __construct(MealAndCocktailIngredientsList $ingredientsList, ConsoleOutputPrinter $output)
+    public function __construct(MealAndCocktailIngredientsFetcher $ingredientsList, ConsoleOutputPrinter $output)
     {
         $this->useCase = $ingredientsList;
         $this->output = $output;

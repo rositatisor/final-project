@@ -6,15 +6,15 @@ namespace App\Domain\Ingredients\UseCase;
 
 use App\Domain\Ingredients\Dto\Ingredient;
 use App\Domain\Ingredients\Dto\IngredientListCollection;
-use App\Domain\TheMealDb\Service\Client as Meal;
-use App\Domain\TheCocktailDb\Service\Client as Cocktail;
+use App\Domain\TheMealDb\Service\MealClient;
+use App\Domain\TheCocktailDb\Service\CocktailClient;
 
-class MealAndCocktailIngredientsList
+class MealAndCocktailIngredientsFetcher
 {
-    private Meal $meal;
-    private Cocktail $cocktail;
+    private MealClient $meal;
+    private CocktailClient $cocktail;
 
-    public function __construct(Meal $meal, Cocktail $cocktail)
+    public function __construct(MealClient $meal, CocktailClient $cocktail)
     {
         $this->meal = $meal;
         $this->cocktail = $cocktail;
@@ -36,6 +36,6 @@ class MealAndCocktailIngredientsList
             $listOfIngredients->add($ingredient);
         }
 
-         return $listOfIngredients;
+        return $listOfIngredients;
     }
 }

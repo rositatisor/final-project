@@ -6,7 +6,7 @@ namespace App\UserInterface\Output;
 
 class ConsoleOutputPrinter implements OutputInterface
 {
-    public function print(string $print)
+    public function print(string $print): void
     {
         print($print);
     }

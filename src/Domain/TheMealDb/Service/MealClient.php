@@ -14,7 +14,7 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class Client implements ClientInterface
+class MealClient implements ClientInterface
 {
     private const GET_RANDOM_MEAL_ENDPOINT = '/1/random.php';
     private const GET = 'GET';
