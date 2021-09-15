@@ -21,6 +21,7 @@
         "symfony/yaml": "5.3.*"
     },
     "require-dev": {
+        "phpspec/prophecy-phpunit": "^2.0",
         "phpunit/phpunit": "^9.5",
         "roave/security-advisories": "dev-latest",
         "symfony/browser-kit": "5.3.*",

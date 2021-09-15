@@ -11,18 +11,17 @@ use App\Domain\Dto\IngredientCollection;
 use App\Exceptions\RequestFailedException;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class Client implements ClientInterface
+class CocktailClient implements ClientInterface
 {
-    private const GET_RANDOM_MEAL_ENDPOINT = '/1/random.php';
+    private const RANDOM_MEAL_ENDPOINT = '/1/random.php';
     private const GET = 'GET';
     private const RANDOM = 0;
 
     private HttpClientInterface $http;
-    private Serializer $serializer;
+    private IngredientSerializer $serializer;
     private IngredientCollectionDenormalizer $denormalizer;
     private string $baseUri;
 
@@ -30,8 +29,7 @@ class Client implements ClientInterface
         IngredientSerializer $serializer,
         IngredientCollectionDenormalizer $denormalizer,
         string $baseUri
-    )
-    {
+    ){
         $this->http = HttpClient::create();
         $this->serializer = $serializer;
         $this->denormalizer = $denormalizer;
@@ -54,7 +52,7 @@ class Client implements ClientInterface
         try {
             return $this->http->request(
                 self::GET,
-                $this->baseUri . self::GET_RANDOM_MEAL_ENDPOINT
+                $this->baseUri . self::RANDOM_MEAL_ENDPOINT
             );
         } catch (ClientException $e) {
             throw new RequestFailedException($e->getMessage());

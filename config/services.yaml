@@ -24,13 +24,21 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    App\Application\IngredientCollection\IngredientDenormalizer:
+        tags: ['serializer.normalizer']
+
+    App\Application\IngredientCollection\IngredientCollectionDenormalizer:
+        tags: ['serializer.normalizer']
+
+    Symfony\Component\Serializer\Serializer:
+
     App\Application\Command\GenerateIngredientsList:
         public: true
 
-    App\Domain\TheCocktailDb\Service\Client:
+    App\Domain\TheCocktailDb\Service\CocktailClient:
         arguments:
             $baseUri: '%APP_COCKTAIL_API_BASE_URI%'
 
-    App\Domain\TheMealDb\Service\Client:
+    App\Domain\TheMealDb\Service\MealClient:
         arguments:
             $baseUri: '%APP_MEAL_API_BASE_URI%'
