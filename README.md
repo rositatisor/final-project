@@ -23,6 +23,8 @@ To run the application with one command in the project directory write to termin
 ```
 php public/app.php
 ```
+## Flowchart
+<img width="750" alt="Flowchart" src="https://user-images.githubusercontent.com/70884246/133593867-0f7fbe9b-a546-4afd-87b1-4bb7525f6159.PNG">
 
 ## Author
 
